@@ -1,3 +1,10 @@
+exports.psqlError = (error, request, response, next) => {
+  if (error.code === "22P02") {
+    response.status(400).send({ message: "Bad request" });
+  }
+  next(error);
+};
+
 exports.customError = (error, request, response, next) => {
   if (error.status && error.message) {
     response.status(error.status).send({ message: error.message });
@@ -7,5 +14,5 @@ exports.customError = (error, request, response, next) => {
 };
 
 exports.unknownError = (error, request, response) => {
-  response.status(500).send({message: "Internal Server Error"})
-}
+  response.status(500).send({ message: "Internal Server Error" })
+};
