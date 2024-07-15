@@ -1,8 +1,11 @@
 # Northcoders News API
 
-For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/courses/be/nc-news).
+## Getting Started
 
-
+run:
+- `npm install`
+- `npm run setup-dbs`
+- `npm test <relative/path/to/app.test.js>`
 
 --- 
 
