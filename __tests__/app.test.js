@@ -10,16 +10,7 @@ afterAll(() => db.end());
 
 describe("/api", () => {
   describe("GET", () => {
-    test("Returns an object with endpoints key", () => {
-      return request(app)
-        .get("/api")
-        .expect(200)
-        .then(({ body }) => {
-          expect(body.endpoints).toBeTruthy();
-        });
-    });
-
-    test("Returns an object of objects with keys representing endpoints", () => {
+    test("Responds with an object of objects with keys representing endpoints", () => {
       return request(app)
         .get("/api")
         .expect(200)
@@ -67,16 +58,7 @@ describe("/api", () => {
 
 describe("/api/topics", () => {
   describe("GET", () => {
-    test("Returns an object with topics key", () => {
-      return request(app)
-        .get("/api/topics")
-        .expect(200)
-        .then(({ body }) => {
-          expect(body.topics).toBeTruthy();
-        });
-    });
-
-    test("Returns topics array of objects with slug, description keys", () => {
+    test("Responds with topics array of objects with keys: slug, description", () => {
       return request(app)
         .get("/api/topics")
         .expect(200)
@@ -93,18 +75,77 @@ describe("/api/topics", () => {
   });
 });
 
+describe("/api/articles", () => {
+  describe("GET", () => {
+    test("Responds with an array of all articles with only the 8 valid keys", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          const articles = body.articles;
+          expect(articles).toHaveLength(13);
+
+          const allowedKeys = [
+            "author",
+            "title",
+            "article_id",
+            "topic",
+            "created_at",
+            "votes",
+            "article_img_url",
+            "comment_count",
+          ];
+          articles.forEach((article) => {
+            const keys = Object.keys(article);
+            expect(keys).toHaveLength(8);
+            keys.forEach((key) => expect(allowedKeys.includes(key)).toBe(true));
+          });
+        });
+    });
+
+    test("comment_count should reflect the number of comments on the article", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          const articles = body.articles;
+          expect(articles).toHaveLength(13);
+
+          const testDataComments = {
+            1: "11",
+            3: "2",
+            5: "2",
+            6: "1",
+            9: "2",
+          };
+          articles.forEach((article) => {
+            const commentCount = testDataComments[article.article_id];
+            if (commentCount) {
+              expect(article.comment_count).toBe(commentCount);
+            } else {
+              expect(article.comment_count).toBe(null);
+            }
+          });
+        });
+    });
+
+    test("The articles should be sorted by created_at date in descending order", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          const articles = body.articles;
+          expect(articles).toHaveLength(13);
+
+          expect(articles).toBeSortedBy("created_at", { descending: true });
+        });
+    });
+  });
+});
+
 describe("/api/articles/:article_id", () => {
   describe("GET", () => {
     describe("Happy paths", () => {
-      test("Returns an object with a key: article", () => {
-        return request(app)
-          .get("/api/articles/2")
-          .expect(200)
-          .then(({ body }) => {
-            expect(body.article).toBeTruthy();
-          });
-      });
-
       test("Article is an object with keys: author, title, article_id, body, topic, created_at, votes, article_img_url", () => {
         return request(app)
           .get("/api/articles/3")
@@ -127,7 +168,7 @@ describe("/api/articles/:article_id", () => {
           });
       });
 
-      test("The returned object is the requested article (article_id = requested number", () => {
+      test("Responds with an object is the requested article (article_id = requested number", () => {
         return request(app)
           .get("/api/articles/4")
           .expect(200)
@@ -153,7 +194,7 @@ describe("/api/articles/:article_id", () => {
           .get("/api/articles/888")
           .expect(404)
           .then(({ body }) => {
-            expect(body.message).toBe("Article not found")
+            expect(body.message).toBe("Article not found");
           });
       });
     });
