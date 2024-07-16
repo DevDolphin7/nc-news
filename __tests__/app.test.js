@@ -201,6 +201,82 @@ describe("/api/articles/:article_id", () => {
   });
 });
 
+describe("/api/articles/:article_id/comments", () => {
+  describe("GET", () => {
+    describe("Happy paths", () => {
+      test("Comment is an object with keys: comment_id, votes, created_at, author, body, article_id", () => {
+        return request(app)
+          .get("/api/articles/3/comments")
+          .expect(200)
+          .then(({ body }) => {
+            const comments = body.comments;
+            expect(comments).toHaveLength(2);
+
+            const allowedKeys = [
+              "comment_id",
+              "votes",
+              "created_at",
+              "author",
+              "body",
+              "article_id",
+            ];
+            comments.forEach((comment) => {
+              const keys = Object.keys(comment);
+              expect(keys).toHaveLength(6);
+
+              keys.forEach((key) => {
+                expect(allowedKeys.includes(key)).toBe(true);
+              });
+            });
+          });
+      });
+
+      test("Responds with all comments associated with the specified article_id", () => {
+        return request(app)
+          .get("/api/articles/1/comments")
+          .expect(200)
+          .then(({ body }) => {
+            const comments = body.comments;
+            expect(comments).toHaveLength(11);
+
+            comments.forEach((comment) => {
+              expect(comment.article_id).toBe(1);
+            });
+          });
+      });
+
+      test("Responds with an empty array if no comments exist for the given article", () => {
+        return request(app)
+          .get("/api/articles/7/comments")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments).toEqual([]);
+          });
+      });
+    });
+
+    describe("Sad paths", () => {
+      test("400: Responds with 400 Bad Request on a non positive integer input", () => {
+        return request(app)
+          .get("/api/articles/cat/comments")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.message).toBe("Bad request");
+          });
+      });
+
+      test("404: Responds with 404 Not Found on a positive integer input that doesn't exist", () => {
+        return request(app)
+          .get("/api/articles/99/comments")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.message).toBe("Article not found");
+          });
+      });
+    });
+  });
+});
+
 describe("ANY /not-a-route", () => {
   test("404: Responds with 404 and 'Not a valid route' when an invalid route is requested", () => {
     return request(app)
