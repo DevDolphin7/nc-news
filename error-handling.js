@@ -2,6 +2,7 @@ exports.psqlError = (error, request, response, next) => {
   if (error.code === "22P02") {
     response.status(400).send({ message: "Bad request" });
   }
+  console.log(error)
   next(error);
 };
 
