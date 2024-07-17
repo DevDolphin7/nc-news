@@ -47,7 +47,22 @@
   "GET /api/articles/:article_id/comments": {
     "description": "Get all comments for an article",
     "exampleResponse": {
-      "article": [
+      "comments": [
+        {
+          "comment_id": 6,
+          "body": "The owls are not what they seem.",
+          "votes": 20,
+          "author": "icellusedkars",
+          "article_id": 9,
+          "created_at": 1584205320000
+        }
+      ]
+    }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "Add a comment to an article",
+    "exampleResponse": {
+      "comment": [
         {
           "comment_id": 6,
           "body": "The owls are not what they seem.",
