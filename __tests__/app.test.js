@@ -96,70 +96,121 @@ describe("/api/topics", () => {
   });
 });
 
-describe("/api/articles", () => {
+describe.only("/api/articles", () => {
   describe("GET", () => {
-    test("Responds with an array of all articles with only the 8 valid keys", () => {
-      return request(app)
-        .get("/api/articles")
-        .expect(200)
-        .then(({ body }) => {
-          const articles = body.articles;
-          expect(articles).toHaveLength(13);
+    describe("Happy paths", () => {
+      test("Responds with an array of all articles with only the 8 valid keys", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then(({ body }) => {
+            const articles = body.articles;
+            expect(articles).toHaveLength(13);
 
-          const allowedKeys = [
-            "author",
-            "title",
-            "article_id",
-            "topic",
-            "created_at",
-            "votes",
-            "article_img_url",
-            "comment_count",
-          ];
-          articles.forEach((article) => {
-            const keys = Object.keys(article);
-            expect(keys).toHaveLength(8);
-            keys.forEach((key) => expect(allowedKeys.includes(key)).toBe(true));
+            const allowedKeys = [
+              "author",
+              "title",
+              "article_id",
+              "topic",
+              "created_at",
+              "votes",
+              "article_img_url",
+              "comment_count",
+            ];
+            articles.forEach((article) => {
+              const keys = Object.keys(article);
+              expect(keys).toHaveLength(8);
+              keys.forEach((key) =>
+                expect(allowedKeys.includes(key)).toBe(true)
+              );
+            });
           });
-        });
+      });
+
+      test("comment_count should reflect the number of comments on the article", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then(({ body }) => {
+            const articles = body.articles;
+            expect(articles).toHaveLength(13);
+
+            const testDataComments = {
+              1: "11",
+              3: "2",
+              5: "2",
+              6: "1",
+              9: "2",
+            };
+            articles.forEach((article) => {
+              const commentCount = testDataComments[article.article_id];
+              if (commentCount) {
+                expect(article.comment_count).toBe(commentCount);
+              } else {
+                expect(article.comment_count).toBe(null);
+              }
+            });
+          });
+      });
+
+      test("The articles should be sorted by created_at date in descending order", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then(({ body }) => {
+            const articles = body.articles;
+            expect(articles).toHaveLength(13);
+
+            expect(articles).toBeSortedBy("created_at", { descending: true });
+          });
+      });
+
+      test("?sort_by should sort the articles by the name of any valid articles property", () => {
+        return request(app)
+          .get("/api/articles?sort_by=title")
+          .expect(200)
+          .then(({ body }) => {
+            const articles = body.articles;
+            expect(articles).toHaveLength(13);
+
+            expect(articles).toBeSortedBy("title", { descending: true });
+          });
+      });
+
+      test("?order=asc should order the articles in ascending order (desc is default)", () => {
+        return request(app)
+          .get("/api/articles?sort_by=title&order=asc")
+          .expect(200)
+          .then(({ body }) => {
+            const articles = body.articles;
+            expect(articles).toHaveLength(13);
+
+            expect(articles).toBeSortedBy("title", { ascending: true });
+          });
+      });
     });
 
-    test("comment_count should reflect the number of comments on the article", () => {
-      return request(app)
-        .get("/api/articles")
-        .expect(200)
-        .then(({ body }) => {
-          const articles = body.articles;
-          expect(articles).toHaveLength(13);
-
-          const testDataComments = {
-            1: "11",
-            3: "2",
-            5: "2",
-            6: "1",
-            9: "2",
-          };
-          articles.forEach((article) => {
-            const commentCount = testDataComments[article.article_id];
-            if (commentCount) {
-              expect(article.comment_count).toBe(commentCount);
-            } else {
-              expect(article.comment_count).toBe(null);
-            }
+    describe("Sad paths", () => {
+      test("400: Responds with 'Bad request' when sort_by isn't a valid property of an article object", () => {
+        return request(app)
+          .get("/api/articles?sort_by=dog")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.message).toBe("Bad request");
           });
-        });
-    });
+      });
 
-    test("The articles should be sorted by created_at date in descending order", () => {
-      return request(app)
-        .get("/api/articles")
-        .expect(200)
-        .then(({ body }) => {
-          const articles = body.articles;
-          expect(articles).toHaveLength(13);
+      test("200: Responds in descending order when order is specified as anything other than 'asc'", () => {
+        return request(app)
+          .get("/api/articles?order=dog")
+          .expect(200)
+          .then(({ body }) => {
+            const articles = body.articles;
+            expect(articles).toHaveLength(13);
 
-          expect(articles).toBeSortedBy("created_at", { descending: true });
-        });
+            expect(articles).toBeSortedBy("created_at", { descending: true });
+          });
+      });
     });
   });
 });

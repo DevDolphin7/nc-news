@@ -22,7 +22,21 @@
   },
   "GET /api/articles": {
     "description": "serves an array of all articles",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "queries": {
+      "author": "",
+      "topic": "",
+      "sort_by": [
+        "author",
+        "title",
+        "article_id",
+        "topic",
+        "created_at",
+        "votes",
+        "article_img_url",
+        "comment_count"
+      ],
+      "order": ["asc", "desc"]
+    },
     "exampleResponse": {
       "articles": [
         {

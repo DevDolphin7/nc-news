@@ -1,6 +1,23 @@
 const db = require("../db/connection");
 
-exports.fetchArticles = () => {
+exports.fetchArticles = (sort_by = "created_at", order) => {
+  const validSortByColumns = [
+    "author",
+    "title",
+    "article_id",
+    "topic",
+    "created_at",
+    "votes",
+    "article_img_url",
+    "comment_count",
+  ];
+
+  if (!validSortByColumns.includes(sort_by)){
+    return Promise.reject({status: 400, message: "Bad request"})
+  }
+
+  order = /^asc$/i.test(order) ? "ASC" : "DESC"
+
   return db
     .query(
       `SELECT author, title, article_id, topic, created_at,
@@ -10,7 +27,7 @@ exports.fetchArticles = () => {
       (SELECT COUNT(article_id) AS comment_count, article_id AS temp_id
       FROM comments GROUP BY article_id) temp_table
       ON articles.article_id = temp_table.temp_id
-      ORDER BY created_at DESC`
+      ORDER BY ${sort_by} ${order}`
     )
     .then(({ rows }) => {
       return rows;
