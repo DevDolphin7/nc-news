@@ -199,6 +199,73 @@ describe("/api/articles/:article_id", () => {
       });
     });
   });
+
+  describe("PATCH", () => {
+    describe("Happy paths", () => {
+      test("Responds with the updated article (vote count increased by requested amount)", () => {
+        return request(app)
+          .patch("/api/articles/3")
+          .send({ inc_votes: 2 })
+          .expect(200)
+          .then(({ body }) => {
+            const article = body.updatedArticle;
+            expect(article).toEqual({
+              article_id: 3,
+              article_img_url:
+                "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+              author: "icellusedkars",
+              body: "some gifs",
+              created_at: "2020-11-03T09:12:00.000Z",
+              title: "Eight pug gifs that remind me of mitch",
+              topic: "mitch",
+              votes: 2, // Updated from 0
+            });
+          });
+      });
+    });
+
+    describe("Sad paths", () => {
+      test("400: Responds with 'Bad request' on a non positive integer article_id", () => {
+        return request(app)
+          .patch("/api/articles/dog")
+          .send({ inc_votes: 3 })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.message).toBe("Bad request");
+          });
+      });
+
+      test("404: Responds with 'Article not found' on a valid article_id that doesn't exist", () => {
+        return request(app)
+          .patch("/api/articles/99")
+          .send({ inc_votes: 4 })
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.message).toBe("Article not found");
+          });
+      });
+
+      test("400: Responds with 'Bad request' on an object not in the format { inc_votes: `<integer>` }", () => {
+        return request(app)
+          .patch("/api/articles/7")
+          .send({ hello: 4 }) // Not inc_votes
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.message).toBe("Bad request");
+            return request(app);
+          })
+          .then((request) => {
+            request
+              .patch("/api/articles/7")
+              .send({ inc_votes: "world" }) // Not an integer
+              .expect(400)
+              .then(({ body }) => {
+                expect(body.message).toBe("Bad request");
+              });
+          });
+      });
+    });
+  });
 });
 
 describe("/api/articles/:article_id/comments", () => {

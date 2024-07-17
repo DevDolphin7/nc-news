@@ -44,6 +44,24 @@
       ]
     }
   },
+  "PATCH /api/articles/:article_id": {
+    "description": "Update an article vote count by article_id",
+    "format": { "inc_votes": 1 },
+    "exampleResponse": {
+      "updatedArticle": [
+        {
+          "article_id": "3",
+          "title": "Seafood substitutions are increasing",
+          "topic": "cooking",
+          "author": "weegembump",
+          "body": "Text from the article..",
+          "created_at": "2018-05-30T15:59:13.341Z",
+          "votes": 1,
+          "article_img_url": "www.example.com/article_image_url"
+        }
+      ]
+    }
+  },
   "GET /api/articles/:article_id/comments": {
     "description": "Get all comments for an article",
     "exampleResponse": {
