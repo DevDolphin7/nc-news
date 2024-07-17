@@ -56,6 +56,27 @@ describe("/api", () => {
   });
 });
 
+describe("/api/users", () => {
+  test("Responds with users array of user objects with keys: username, name, avatar_url", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const allUsers = body.users;
+        expect(allUsers).toHaveLength(4);
+
+        const allowedKeys = ["username", "name", "avatar_url"];
+        allUsers.forEach((user) => {
+          expect(Object.keys(user)).toHaveLength(3);
+
+          allowedKeys.forEach((key) => {
+            expect(typeof user[key]).toBe("string");
+          });
+        });
+      });
+  });
+});
+
 describe("/api/topics", () => {
   describe("GET", () => {
     test("Responds with topics array of objects with keys: slug, description", () => {

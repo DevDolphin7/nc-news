@@ -1,6 +1,7 @@
 const express = require("express");
 const { psqlError, customError, unknownError } = require("../error-handling");
 const { getApi } = require("../controllers/api.controller");
+const { getUsers } = require("../controllers/users.controller");
 const { getTopics } = require("../controllers/topics.controller");
 const {
   getArticles,
@@ -18,6 +19,8 @@ const app = express();
 app.use(express.json());
 
 app.get("/api", getApi);
+
+app.get("/api/users", getUsers);
 
 app.get("/api/topics", getTopics);
 

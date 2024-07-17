@@ -1,6 +1,17 @@
 {
   "GET /api": {
-    "description": "serves up a json representation of all the available endpoints of the api"
+    "description": "serves up a json representation of all the available endpoints of the api",
+    "exampleResponse": { "endpoints": "<this JSON parsed to an object>" }
+  },
+  "GET /api/users": {
+    "description": "Get all users",
+    "exampleResponse": [
+      {
+        "username": "weegembump",
+        "name": "Killoah",
+        "avatar_url": "www.example.com/avatar_image_url"
+      }
+    ]
   },
   "GET /api/topics": {
     "description": "serves an array of all topics",
