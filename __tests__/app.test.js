@@ -413,6 +413,48 @@ describe("/api/articles/:article_id/comments", () => {
   });
 });
 
+describe("/api/comments/:comment_id", () => {
+  describe("DELETE", () => {
+    describe("Happy paths", () => {
+      test("204: Responds with a 204 status code upon successful deletion", () => {
+        return request(app)
+          .delete("/api/comments/4")
+          .expect(204)
+          .then(() => {
+            return db;
+          })
+          .then((db) => {
+            db.query("SELECT * FROM comments WHERE comment_id = 4").then(
+              ({ rows }) => {
+                expect(rows).toHaveLength(0);
+              }
+            );
+          });
+      });
+    });
+
+    describe("Sad paths", () => {
+      test("400: Responds with 'Bad request' on a non positive integer comment_id", () => {
+        return request(app)
+          .delete("/api/comments/dog")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.message).toBe("Bad request");
+          });
+      });
+
+      test("404: Responds with 'Comment not found' on a positive integer comment_id that doesn't exist", () => {
+        return request(app)
+          .delete("/api/comments/99")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.message).toBe("Comment not found");
+          });
+      });
+    });
+  });
+});
+
 describe("ANY /not-a-route", () => {
   test("404: Responds with 404 and 'Not a valid route' when an invalid route is requested", () => {
     return request(app)
