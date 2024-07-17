@@ -275,6 +275,75 @@ describe("/api/articles/:article_id/comments", () => {
       });
     });
   });
+
+  describe("POST", () => {
+    describe("Happy paths", () => {
+      test("201: Responds with comment - an object with keys: comment_id, votes, created_at, author, body, article_id", () => {
+        return request(app)
+          .post("/api/articles/5/comments")
+          .send({ username: "rogersop", body: "Hello, world!" })
+          .expect(201)
+          .then(({ body }) => {
+            const comment = body.comment;
+            const [keys, values] = [
+              Object.keys(comment),
+              Object.values(comment),
+            ];
+            expect(keys).toHaveLength(6);
+
+            const validKeys = [
+              "comment_id",
+              "votes",
+              "created_at",
+              "author",
+              "body",
+              "article_id",
+            ];
+            for (let i = 0; i < keys.length; i++) {
+              expect(validKeys.includes(keys[i])).toBe(true);
+              const output = typeof values[i];
+              expect(output === "string" || output === "number").toBe(true);
+            }
+          });
+      });
+    });
+
+    describe("Sad paths", () => {
+      test("400: Responds with 'Bad request' on a non positive integer article_id", () => {
+        return request(app)
+          .post("/api/articles/cat/comments")
+          .send({ username: "rogersop", body: "Hello, world!" })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.message).toBe("Bad request");
+          });
+      });
+
+      test("404: Responds with 'Article not found' on a positive integer article_id that doesn't exist", () => {
+        return request(app)
+          .post("/api/articles/99/comments")
+          .send({ username: "rogersop", body: "Hello, world!" })
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.message).toBe("Article not found");
+          });
+      });
+
+      test("400: Responds with 'Bad request' where the posted data is not in format { username: `<string>`, body: `<string>` }", () => {
+        return request(app)
+          .post("/api/articles/7/comments")
+          .send({
+            username: "rogersop",
+            body: "Hello, world!",
+            sneakyKey: "drop all databases?",
+          })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.message).toBe("Bad request");
+          });
+      });
+    });
+  });
 });
 
 describe("ANY /not-a-route", () => {

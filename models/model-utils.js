@@ -11,3 +11,30 @@ exports.checkForeignPrimaryKey = (foreignTable, columnName, id) => {
     return rows.length !== 0;
   });
 };
+
+exports.checkValidPostedComment = (commentInput, article_id) => {
+  const validKeys = ["username", "body", "article_id"];
+  const comment = JSON.parse(JSON.stringify(commentInput))
+
+  if (article_id) {
+    comment.article_id = article_id
+  }
+
+  const commentKeys = Object.keys(comment);
+
+  if (commentKeys.length !== validKeys.length) {
+    return false;
+  }
+
+  for (let key of commentKeys) {
+    if (!validKeys.includes(key)) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+exports.formatObjectToArray = (object, sortBy) => [
+  sortBy.map((key) => object[key]),
+];
