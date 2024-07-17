@@ -11,6 +11,7 @@ const {
   getCommentsOfArticle,
   postCommentToArticle,
 } = require("../controllers/article-comments.controller.js");
+const { deleteCommentById } = require("../controllers/comments.controller");
 
 const app = express();
 
@@ -26,6 +27,8 @@ app.patch("/api/articles/:article_id", patchArticleVoteIncrease);
 
 app.get("/api/articles/:article_id/comments", getCommentsOfArticle);
 app.post("/api/articles/:article_id/comments", postCommentToArticle);
+
+app.delete("/api/comments/:comment_id", deleteCommentById);
 
 app.all("*", (request, response, next) => {
   next({ status: 404, message: "Not a valid route" });
