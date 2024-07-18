@@ -4,7 +4,7 @@ Check it out: [https://dolphin-news.onrender.com/api/articles](https://dolphin-n
 
 ## Description
 
-Dolphin news is fun a mock news site to play with! It's written in JavaScript with some SQL, utilising PSQL and Express. Currently it is just a back-end... stay tuned until September 2024 for a front-end!
+Dolphin news is fun a mock news site to play with! It's written in JavaScript and SQL, utilising Express and PSQL. Currently, it's just a back-end... stay tuned until September 2024 for a front-end!
 
 ---
 
@@ -40,5 +40,7 @@ To test a specific file, for example `app.test.js` from root: `npm test __tests_
 > The test file will seed the database with test data before each test
 
 --- 
+
+## Acknowledgement
 
 This portfolio project was created as part of a Digital Skills Bootcamp in Software Engineering provided by [Northcoders](https://northcoders.com/)
