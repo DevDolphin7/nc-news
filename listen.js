@@ -1,4 +1,4 @@
-const app = require('./endoints/app.js');
+const app = require('./endpoints/app.js');
 const { PORT = 9090 } = process.env;
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}...`));
