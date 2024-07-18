@@ -10,7 +10,7 @@ afterAll(() => db.end());
 
 describe("/api", () => {
   describe("GET", () => {
-    test("Responds with an object of objects with keys representing endpoints", () => {
+    test("200: Responds with an object of objects with keys representing endpoints", () => {
       return request(app)
         .get("/api")
         .expect(200)
@@ -26,7 +26,7 @@ describe("/api", () => {
         });
     });
 
-    test("Each endpoint key is an object containing up to 4 keys description, queries, format, exampleResponse", () => {
+    test("200: Each endpoint key is an object containing up to 4 keys description, queries, format, exampleResponse", () => {
       return request(app)
         .get("/api")
         .expect(200)
@@ -57,7 +57,7 @@ describe("/api", () => {
 });
 
 describe("/api/users", () => {
-  test("Responds with users array of user objects with keys: username, name, avatar_url", () => {
+  test("200: Responds with users array of user objects with keys: username, name, avatar_url", () => {
     return request(app)
       .get("/api/users")
       .expect(200)
@@ -77,9 +77,59 @@ describe("/api/users", () => {
   });
 });
 
+describe("/api/users/:username", () => {
+  describe("GET", () => {
+    describe("Happy paths", () => {
+      test("200: User is an object with keys: username, name, avatar_url", () => {
+        return request(app)
+          .get("/api/users/lurker")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.user).toEqual({
+              username: "lurker",
+              name: "do_nothing",
+              avatar_url:
+                "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+            });
+          });
+      });
+
+      test("200: Responds with the requested user", () => {
+        return request(app)
+          .get("/api/users/lurker")
+          .expect(200)
+          .then(({ body }) => {
+            const user = body.user;
+            expect(user.username).toBe("lurker");
+          });
+      });
+    });
+
+    describe("Sad paths", () => {
+      test("400: Responds with 'Bad request' on an invalid username input", () => {
+        return request(app)
+          .get("/api/users/Droping;all;dbs")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.message).toBe("Bad request");
+          });
+      });
+
+      test("404: Responds with 'User not found' on a valid username input that doesn't exist", () => {
+        return request(app)
+          .get("/api/users/helloWorld")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.message).toBe("User not found");
+          });
+      });
+    });
+  });
+});
+
 describe("/api/topics", () => {
   describe("GET", () => {
-    test("Responds with topics array of objects with keys: slug, description", () => {
+    test("200: Responds with topics array of objects with keys: slug, description", () => {
       return request(app)
         .get("/api/topics")
         .expect(200)
@@ -99,7 +149,7 @@ describe("/api/topics", () => {
 describe("/api/articles", () => {
   describe("GET", () => {
     describe("Happy paths", () => {
-      test("Responds with an array of all articles with only the 8 valid keys", () => {
+      test("200: Responds with an array of all articles with only the 8 valid keys", () => {
         return request(app)
           .get("/api/articles")
           .expect(200)
@@ -127,7 +177,7 @@ describe("/api/articles", () => {
           });
       });
 
-      test("comment_count should reflect the number of comments on the article", () => {
+      test("200: comment_count should reflect the number of comments on the article", () => {
         return request(app)
           .get("/api/articles")
           .expect(200)
@@ -153,7 +203,7 @@ describe("/api/articles", () => {
           });
       });
 
-      test("The articles should be sorted by created_at date in descending order", () => {
+      test("200: The articles should be sorted by created_at date in descending order", () => {
         return request(app)
           .get("/api/articles")
           .expect(200)
@@ -165,7 +215,7 @@ describe("/api/articles", () => {
           });
       });
 
-      test("?sort_by should sort the articles by the name of any valid articles property", () => {
+      test("200: ?sort_by should sort the articles by the name of any valid articles property", () => {
         return request(app)
           .get("/api/articles?sort_by=title")
           .expect(200)
@@ -177,7 +227,7 @@ describe("/api/articles", () => {
           });
       });
 
-      test("?order=asc should order the articles in ascending order (desc is default)", () => {
+      test("200: ?order=asc should order the articles in ascending order (desc is default)", () => {
         return request(app)
           .get("/api/articles?sort_by=title&order=asc")
           .expect(200)
@@ -189,7 +239,7 @@ describe("/api/articles", () => {
           });
       });
 
-      test("?topic should filter the articles to match the provided topic", () => {
+      test("200: ?topic should filter the articles to match the provided topic", () => {
         return request(app)
           .get("/api/articles?topic=cats")
           .expect(200)
@@ -200,7 +250,7 @@ describe("/api/articles", () => {
           });
       });
 
-      test("?topic should return a blank array (on a key of articles) when the topic exists but has no associated articles", () => {
+      test("200: ?topic should return a blank array (on a key of articles) when the topic exists but has no associated articles", () => {
         return request(app)
           .get("/api/articles?topic=paper")
           .expect(200)
@@ -247,7 +297,7 @@ describe("/api/articles", () => {
 describe("/api/articles/:article_id", () => {
   describe("GET", () => {
     describe("Happy paths", () => {
-      test("Article is an object with keys: author, title, article_id, body, topic, created_at, votes, article_img_url, comment_count", () => {
+      test("200: Article is an object with keys: author, title, article_id, body, topic, created_at, votes, article_img_url, comment_count", () => {
         return request(app)
           .get("/api/articles/3")
           .expect(200)
@@ -270,7 +320,7 @@ describe("/api/articles/:article_id", () => {
           });
       });
 
-      test("Responds with an object is the requested article (article_id = requested number", () => {
+      test("200: Responds with the requested article", () => {
         return request(app)
           .get("/api/articles/4")
           .expect(200)
@@ -282,7 +332,7 @@ describe("/api/articles/:article_id", () => {
     });
 
     describe("Sad paths", () => {
-      test("400: Responds with 400 Bad Request on a non positive integer input", () => {
+      test("400: Responds with 'Bad request' on a non positive integer input", () => {
         return request(app)
           .get("/api/articles/dog")
           .expect(400)
@@ -291,7 +341,7 @@ describe("/api/articles/:article_id", () => {
           });
       });
 
-      test("404: Responds with 404 Not Found on a valid input that doesn't exist", () => {
+      test("404: Responds with 'Article not found' on a valid input that doesn't exist", () => {
         return request(app)
           .get("/api/articles/888")
           .expect(404)
@@ -304,7 +354,7 @@ describe("/api/articles/:article_id", () => {
 
   describe("PATCH", () => {
     describe("Happy paths", () => {
-      test("Responds with the updated article (vote count increased by requested amount)", () => {
+      test("200: Responds with the updated article (vote count increased by requested amount)", () => {
         return request(app)
           .patch("/api/articles/3")
           .send({ inc_votes: 2 })
@@ -373,7 +423,7 @@ describe("/api/articles/:article_id", () => {
 describe("/api/articles/:article_id/comments", () => {
   describe("GET", () => {
     describe("Happy paths", () => {
-      test("Comment is an object with keys: comment_id, votes, created_at, author, body, article_id", () => {
+      test("200: Comment is an object with keys: comment_id, votes, created_at, author, body, article_id", () => {
         return request(app)
           .get("/api/articles/3/comments")
           .expect(200)
@@ -400,7 +450,7 @@ describe("/api/articles/:article_id/comments", () => {
           });
       });
 
-      test("Responds with all comments associated with the specified article_id", () => {
+      test("200: Responds with all comments associated with the specified article_id", () => {
         return request(app)
           .get("/api/articles/1/comments")
           .expect(200)
@@ -414,7 +464,7 @@ describe("/api/articles/:article_id/comments", () => {
           });
       });
 
-      test("Responds with an empty array if no comments exist for the given article", () => {
+      test("200: Responds with an empty array if no comments exist for the given article", () => {
         return request(app)
           .get("/api/articles/7/comments")
           .expect(200)
@@ -425,7 +475,7 @@ describe("/api/articles/:article_id/comments", () => {
     });
 
     describe("Sad paths", () => {
-      test("400: Responds with 400 Bad Request on a non positive integer input", () => {
+      test("400: Responds with 'Bad request' on a non positive integer input", () => {
         return request(app)
           .get("/api/articles/cat/comments")
           .expect(400)
@@ -434,7 +484,7 @@ describe("/api/articles/:article_id/comments", () => {
           });
       });
 
-      test("404: Responds with 404 Not Found on a positive integer input that doesn't exist", () => {
+      test("404: Responds with 'Article not found' on a positive integer input that doesn't exist", () => {
         return request(app)
           .get("/api/articles/99/comments")
           .expect(404)
@@ -518,7 +568,7 @@ describe("/api/articles/:article_id/comments", () => {
 describe("/api/comments/:comment_id", () => {
   describe("PATCH", () => {
     describe("Happy paths", () => {
-      test("Responds with the updated comment (vote count increased by requested amount)", () => {
+      test("200: Responds with the updated comment (vote count increased by requested amount)", () => {
         return request(app)
           .patch("/api/comments/3")
           .send({ inc_votes: 3 })
@@ -552,6 +602,7 @@ describe("/api/comments/:comment_id", () => {
         return request(app)
           .patch("/api/comments/99")
           .send({ inc_votes: 1 })
+          .expect(404)
           .then(({ body }) => {
             expect(body.message).toBe("Comment not found");
           });
@@ -625,7 +676,7 @@ describe("/api/comments/:comment_id", () => {
 });
 
 describe("ANY /not-a-route", () => {
-  test("404: Responds with 404 and 'Not a valid route' when an invalid route is requested", () => {
+  test("404: Responds with 'Not a valid route' when an invalid route is requested", () => {
     return request(app)
       .get("/api/helloworld")
       .expect(404)

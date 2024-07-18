@@ -2,6 +2,7 @@ const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data");
 const db = require("../db/connection");
 const {
+  checkValidUsername,
   checkForeignPrimaryKey,
   checkValidPostedComment,
   formatObjectToArray,
@@ -12,6 +13,32 @@ const {
 beforeEach(() => seed(data));
 
 afterAll(() => db.end());
+
+describe.only("checkValidUsername", () => {
+  test("Returns a boolean", () => {
+    const input = "Hello";
+    const output = checkValidUsername(input);
+    expect(typeof output).toBe("boolean");
+  });
+
+  test("Returns false on a blank string", () => {
+    const input = "";
+    const output = checkValidUsername(input);
+    expect(output).toBe(false);
+  });
+
+  test("Returns true if only /characters between/ are present: /A-Za-z0-9-_/", () => {
+    const input = "A-Za-z0-9-_";
+    const output = checkValidUsername(input);
+    expect(output).toBe(true);
+  });
+
+  test("Returns false if any other character is present", () => {
+    const input = ";";
+    const output = checkValidUsername(input);
+    expect(output).toBe(false);
+  });
+});
 
 describe("checkForeignPrimaryKey", () => {
   test("Returns true when the id exists in the provided columnName and table", () => {
