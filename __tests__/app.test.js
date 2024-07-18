@@ -247,13 +247,13 @@ describe("/api/articles", () => {
 describe("/api/articles/:article_id", () => {
   describe("GET", () => {
     describe("Happy paths", () => {
-      test("Article is an object with keys: author, title, article_id, body, topic, created_at, votes, article_img_url", () => {
+      test("Article is an object with keys: author, title, article_id, body, topic, created_at, votes, article_img_url, comment_count", () => {
         return request(app)
           .get("/api/articles/3")
           .expect(200)
           .then(({ body }) => {
             const keys = Object.keys(body.article);
-            expect(keys).toHaveLength(8);
+            expect(keys).toHaveLength(9);
 
             const allowedKeys = [
               "author",
@@ -264,6 +264,7 @@ describe("/api/articles/:article_id", () => {
               "created_at",
               "votes",
               "article_img_url",
+              "comment_count",
             ];
             keys.forEach((key) => expect(allowedKeys.includes(key)).toBe(true));
           });
