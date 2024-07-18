@@ -12,7 +12,10 @@ const {
   getCommentsOfArticle,
   postCommentToArticle,
 } = require("../controllers/article-comments.controller.js");
-const { deleteCommentById } = require("../controllers/comments.controller");
+const {
+  patchCommentById,
+  deleteCommentById,
+} = require("../controllers/comments.controller");
 
 const app = express();
 
@@ -25,13 +28,13 @@ app.get("/api/users", getUsers);
 app.get("/api/topics", getTopics);
 
 app.get("/api/articles", getArticles);
-
 app.get("/api/articles/:article_id", getArticleById);
 app.patch("/api/articles/:article_id", patchArticleVoteIncrease);
 
 app.get("/api/articles/:article_id/comments", getCommentsOfArticle);
 app.post("/api/articles/:article_id/comments", postCommentToArticle);
 
+app.patch("/api/comments/:comment_id", patchCommentById);
 app.delete("/api/comments/:comment_id", deleteCommentById);
 
 app.all("*", (request, response, next) => {

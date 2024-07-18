@@ -1,4 +1,4 @@
-const { validateParameters } = require("./model-utils");
+const { validateParameters, checkValidVoteIncrease } = require("./model-utils");
 const db = require("../db/connection");
 
 exports.fetchArticles = (sort_by = "created_at", order, topic) => {
@@ -35,10 +35,10 @@ exports.fetchArticleById = (id) => {
 };
 
 exports.updateArticleVoteIncrease = (increaseVotesBy, id) => {
-  const votesKeys = Object.keys(increaseVotesBy);
-  if (votesKeys.length !== 1 || votesKeys[0] !== "inc_votes") {
-    return Promise.reject({ status: 400, message: "Bad request" });
+  if (!checkValidVoteIncrease(increaseVotesBy)) {
+    return Promise.reject({ status: 400, message: "Bad request" })
   }
+
   return db
     .query(
       "UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *",

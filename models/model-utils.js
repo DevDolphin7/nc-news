@@ -78,3 +78,11 @@ exports.validateParameters = (sort_by, order, topic) => {
 
   return Promise.all(promises);
 };
+
+exports.checkValidVoteIncrease = (increaseVotesBy) => {
+  const votesKeys = Object.keys(increaseVotesBy);
+  if (votesKeys.length !== 1 || votesKeys[0] !== "inc_votes") {
+    return false;
+  }
+  return Number.isInteger(increaseVotesBy.inc_votes)
+}
