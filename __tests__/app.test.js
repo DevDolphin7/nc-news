@@ -515,6 +515,73 @@ describe("/api/articles/:article_id/comments", () => {
 });
 
 describe("/api/comments/:comment_id", () => {
+  describe("PATCH", () => {
+    describe("Happy paths", () => {
+      test("Responds with the updated comment (vote count increased by requested amount)", () => {
+        return request(app)
+          .patch("/api/comments/3")
+          .send({ inc_votes: 3 })
+          .expect(200)
+          .then(({ body }) => {
+            const comment = body.updatedComment;
+            expect(comment).toEqual({
+              body: "Replacing the quiet elegance of the dark suit and tie with the casual indifference of these muted earth tones is a form of fashion suicide, but, uh, call me crazy — onyou it works.",
+              votes: 103, // Increased by 3
+              author: "icellusedkars",
+              article_id: 1,
+              comment_id: 3,
+              created_at: "2020-03-01T01:13:00.000Z",
+            });
+          });
+      });
+    });
+
+    describe("Sad paths", () => {
+      test("400: Responds with 'Bad request' on a non positive integer comment_id", () => {
+        return request(app)
+          .patch("/api/comments/comment_id")
+          .send({ inc_votes: 1.5 })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.message).toBe("Bad request");
+          });
+      });
+
+      test("404: Responds with 'Comment not found' on a valid comment_id that doesn't exist", () => {
+        return request(app)
+          .patch("/api/comments/99")
+          .send({ inc_votes: 1 })
+          .then(({ body }) => {
+            expect(body.message).toBe("Comment not found");
+          });
+      });
+
+      test("400: Responds with 'Bad request' on an object not in the format { inc_votes: `<integer>` }", () => {
+        return request(app)
+          .patch("/api/comments/3")
+          .send({ inc_votes: 2, sneakyKey: "drop all databases?" })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.message).toBe("Bad request");
+            return request(app)
+              .patch("/api/comments/4")
+              .send({ inc_votes: 2.5 })
+              .expect(400);
+          })
+          .then(({ body }) => {
+            expect(body.message).toBe("Bad request");
+            return request(app)
+              .patch("/api/comments/5")
+              .send({ wrong_key_provided: 2 })
+              .expect(400);
+          })
+          .then(({ body }) => {
+            expect(body.message).toBe("Bad request");
+          });
+      });
+    });
+  });
+
   describe("DELETE", () => {
     describe("Happy paths", () => {
       test("204: Responds with a 204 status code upon successful deletion", () => {

@@ -131,6 +131,22 @@
       ]
     }
   },
+  "PATCH /api/comments/:comment_id": {
+    "description": "Update a comment vote count by comment_id",
+    "format": { "inc_votes": 1 },
+    "exampleResponse": {
+      "updatedComment": [
+        {
+          "comment_id": 6,
+          "body": "The owls are not what they seem.",
+          "votes": 21,
+          "author": "icellusedkars",
+          "article_id": 9,
+          "created_at": 1584205320000
+        }
+      ]
+    }
+  },
   "DELETE /api/comments/:comment_id": {
     "description": "Delete the given comment by comment_id"
   }
