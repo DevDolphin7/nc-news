@@ -3,6 +3,7 @@ const {
   checkForeignPrimaryKey,
   checkValidPostedComment,
   formatObjectToArray,
+  validateParameters,
 } = require("../models/model-utils");
 
 afterAll(() => db.end());
@@ -70,10 +71,10 @@ describe("checkValidPostedComment", () => {
   test("Does not mutate the input", () => {
     const input = { username: "hello", body: "world" };
     const article_id = 1;
-    const inputCopy = JSON.parse(JSON.stringify(input))
+    const inputCopy = JSON.parse(JSON.stringify(input));
     checkValidPostedComment(input, article_id);
     expect(input).toEqual(inputCopy);
-  })
+  });
 });
 
 describe("formatObjectToArray", () => {
@@ -111,5 +112,54 @@ describe("formatObjectToArray", () => {
     const inputCopy = JSON.parse(JSON.stringify(input));
     formatObjectToArray(input, sortOrder);
     expect(input).toEqual(inputCopy);
+  });
+});
+
+describe("validateParameters", () => {
+  test("Promise resolves to an array of the formatted inputs when given valid inputs", () => {
+    const inputs = ["created_at", "asc", "cats"];
+    return validateParameters(...inputs)
+      .then((results) => {
+        expect(Array.isArray(results)).toBe(true);
+        expect(results).toEqual(["created_at", "ASC", "'cats'"]);
+      })
+      .catch((error) => {
+        console.log(error, "<<<<<<<<<error in test")
+        expect(1).toBe(0); // Promise should resolve not reject
+      });
+  });
+
+  test("400: Promise rejects with message 'Bad request' on an invalid sort_by", () => {
+    const inputs = ["dog", "ASC", "cats"];
+    return validateParameters(...inputs)
+      .then(() => {
+        expect(1).toBe(0); // Promise should reject not resolve
+      })
+      .catch((results) => {
+        expect(results).toEqual({ status: 400, message: "Bad request" });
+      });
+  });
+
+  test("Promise resolves on an invalid order, setting it to DESC", () => {
+    const inputs = ["created_at", "tail", "cats"];
+    return validateParameters(...inputs)
+      .then((results) => {
+        expect(Array.isArray(results)).toBe(true);
+        expect(results).toEqual(["created_at", "DESC", "'cats'"]);
+      })
+      .catch(() => {
+        expect(1).toBe(0); // Promise should resolve not reject
+      });
+  });
+
+  test("404: Promise rejects with message 'Topic not found' on an invalid topic", () => {
+    const inputs = ["created_at", "DESC", "bananas"];
+    return validateParameters(...inputs)
+      .then(() => {
+        expect(1).toBe(0); // Promise should reject not resolve
+      })
+      .catch((results) => {
+        expect(results).toEqual({ status: 404, message: "Topic not found" });
+      });
   });
 });

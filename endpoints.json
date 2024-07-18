@@ -24,7 +24,7 @@
     "description": "serves an array of all articles",
     "queries": {
       "author": "",
-      "topic": "",
+      "topic": "<topic-slug>",
       "sort_by": [
         "author",
         "title",
@@ -53,7 +53,21 @@
   },
   "GET /api/articles/:article_id": {
     "description": "serves an article by it's ID",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "queries": {
+      "author": "",
+      "topic": "<topic-slug>",
+      "sort_by": [
+        "author",
+        "title",
+        "article_id",
+        "topic",
+        "created_at",
+        "votes",
+        "article_img_url",
+        "comment_count"
+      ],
+      "order": ["asc", "desc"]
+    },
     "exampleResponse": {
       "article": [
         {

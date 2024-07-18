@@ -14,10 +14,10 @@ exports.checkForeignPrimaryKey = (foreignTable, columnName, id) => {
 
 exports.checkValidPostedComment = (commentInput, article_id) => {
   const validKeys = ["username", "body", "article_id"];
-  const comment = JSON.parse(JSON.stringify(commentInput))
+  const comment = JSON.parse(JSON.stringify(commentInput));
 
   if (article_id) {
-    comment.article_id = article_id
+    comment.article_id = article_id;
   }
 
   const commentKeys = Object.keys(comment);
@@ -38,3 +38,43 @@ exports.checkValidPostedComment = (commentInput, article_id) => {
 exports.formatObjectToArray = (object, sortBy) => [
   sortBy.map((key) => object[key]),
 ];
+
+exports.validateParameters = (sort_by, order, topic) => {
+  // validate sort by
+  const validSortByColumns = [
+    "author",
+    "title",
+    "article_id",
+    "topic",
+    "created_at",
+    "votes",
+    "article_img_url",
+    "comment_count",
+  ];
+
+  if (!validSortByColumns.includes(sort_by)) {
+    return Promise.reject({ status: 400, message: "Bad request" });
+  }
+
+  // validate order
+  order = /^asc$/i.test(order) ? "ASC" : "DESC";
+
+  const promises = [sort_by, order];
+
+  // validate topic (first fetch valid topics from the database)
+  if (topic !== undefined) {
+    const fetchTopics = db.query("SELECT slug FROM topics").then(({ rows }) => {
+      const validTopics = rows.map((response) => response.slug);
+
+      return validTopics.includes(topic)
+        ? `'${topic}'`
+        : Promise.reject({ status: 404, message: "Topic not found" });
+    });
+    promises.push(fetchTopics);
+  } else {
+    // If topic was not defined, below SQL will ignore topic WHERE condition
+    promises.push("ANY (SELECT slug FROM topics)");
+  }
+
+  return Promise.all(promises);
+};
