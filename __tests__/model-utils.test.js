@@ -1,10 +1,15 @@
+const seed = require("../db/seeds/seed");
+const data = require("../db/data/test-data");
 const db = require("../db/connection");
 const {
   checkForeignPrimaryKey,
   checkValidPostedComment,
   formatObjectToArray,
   validateParameters,
+  checkValidVoteIncrease,
 } = require("../models/model-utils");
+
+beforeEach(() => seed(data));
 
 afterAll(() => db.end());
 
@@ -124,7 +129,7 @@ describe("validateParameters", () => {
         expect(results).toEqual(["created_at", "ASC", "'cats'"]);
       })
       .catch((error) => {
-        console.log(error, "<<<<<<<<<error in test")
+        console.log(error, "<<<<<<<<<error in test");
         expect(1).toBe(0); // Promise should resolve not reject
       });
   });
@@ -161,5 +166,46 @@ describe("validateParameters", () => {
       .catch((results) => {
         expect(results).toEqual({ status: 404, message: "Topic not found" });
       });
+  });
+});
+
+describe("checkValidVoteIncrease", () => {
+  test("Returns a boolean", () => {
+    const input = { inc_votes: 1 };
+    const output = checkValidVoteIncrease(input);
+    expect(typeof output).toBe("boolean");
+  });
+
+  describe("Test functionality", () => {
+    test("Returns true if input is in format { inc_votes: <INT> }", () => {
+      const input = { inc_votes: 1 };
+      const output = checkValidVoteIncrease(input);
+      expect(output).toBe(true);
+    });
+
+    test("Returns false if inc_votes does not exist", () => {
+      const input = { test: 1 };
+      const output = checkValidVoteIncrease(input);
+      expect(output).toBe(false);
+    });
+
+    test("Returns false if any other key exists", () => {
+      const input = { inc_votes: 1, test: 1 };
+      const output = checkValidVoteIncrease(input);
+      expect(output).toBe(false);
+    });
+
+    test("Returns false if value of inc-votes is not an INT", () => {
+      const input = { inc_votes: 1.5 };
+      const output = checkValidVoteIncrease(input);
+      expect(output).toBe(false);
+    });
+  });
+
+  test("Function purity - Does not mutate the input", () => {
+    const input = { inc_votes: 2 };
+    const inputCopy = JSON.parse(JSON.stringify(input));
+    checkValidVoteIncrease(input);
+    expect(input).toEqual(inputCopy);
   });
 });
