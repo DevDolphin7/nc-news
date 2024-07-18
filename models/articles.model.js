@@ -1,34 +1,23 @@
+const { validateParameters } = require("./model-utils");
 const db = require("../db/connection");
 
-exports.fetchArticles = (sort_by = "created_at", order) => {
-  const validSortByColumns = [
-    "author",
-    "title",
-    "article_id",
-    "topic",
-    "created_at",
-    "votes",
-    "article_img_url",
-    "comment_count",
-  ];
+exports.fetchArticles = (sort_by = "created_at", order, topic) => {
+  return validateParameters(sort_by, order, topic)
+    .then((parameters) => {
+      const [sort_by, order, topic] = parameters;
 
-  if (!validSortByColumns.includes(sort_by)){
-    return Promise.reject({status: 400, message: "Bad request"})
-  }
-
-  order = /^asc$/i.test(order) ? "ASC" : "DESC"
-
-  return db
-    .query(
-      `SELECT author, title, article_id, topic, created_at,
+      return db.query(
+        `SELECT author, title, article_id, topic, created_at,
       votes, article_img_url, comment_count
       FROM articles
       LEFT JOIN
       (SELECT COUNT(article_id) AS comment_count, article_id AS temp_id
       FROM comments GROUP BY article_id) temp_table
       ON articles.article_id = temp_table.temp_id
+      WHERE topic = ${topic}
       ORDER BY ${sort_by} ${order}`
-    )
+      );
+    })
     .then(({ rows }) => {
       return rows;
     });

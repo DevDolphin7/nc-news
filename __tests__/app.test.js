@@ -96,7 +96,7 @@ describe("/api/topics", () => {
   });
 });
 
-describe.only("/api/articles", () => {
+describe("/api/articles", () => {
   describe("GET", () => {
     describe("Happy paths", () => {
       test("Responds with an array of all articles with only the 8 valid keys", () => {
@@ -188,6 +188,26 @@ describe.only("/api/articles", () => {
             expect(articles).toBeSortedBy("title", { ascending: true });
           });
       });
+
+      test("?topic should filter the articles to match the provided topic", () => {
+        return request(app)
+          .get("/api/articles?topic=cats")
+          .expect(200)
+          .then(({ body }) => {
+            const articles = body.articles;
+            expect(articles).toHaveLength(1);
+            expect(articles[0].topic).toBe("cats");
+          });
+      });
+
+      test("?topic should return a blank array (on a key of articles) when the topic exists but has no associated articles", () => {
+        return request(app)
+          .get("/api/articles?topic=paper")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toEqual([]);
+          });
+      });
     });
 
     describe("Sad paths", () => {
@@ -209,6 +229,15 @@ describe.only("/api/articles", () => {
             expect(articles).toHaveLength(13);
 
             expect(articles).toBeSortedBy("created_at", { descending: true });
+          });
+      });
+
+      test("404: Responds with 'Topic not found' when the topic doesn't exist", () => {
+        return request(app)
+          .get("/api/articles?topic=dog")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.message).toBe("Topic not found");
           });
       });
     });
