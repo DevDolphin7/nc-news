@@ -17,7 +17,7 @@ app.use("/api", apiRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/topics", topicsRouter);
 app.use("/api/articles", articlesRouter);
-app.use("/api/comments", commentsRouter)
+app.use("/api/comments", commentsRouter);
 
 app.all("*", (request, response, next) => {
   next({ status: 404, message: "Not a valid route" });

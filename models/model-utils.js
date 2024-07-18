@@ -1,5 +1,9 @@
 const db = require("../db/connection");
 
+exports.checkValidUsername = (username) => {
+  return /^[\w\d_\-]+$/.test(username);
+};
+
 exports.checkForeignPrimaryKey = (foreignTable, columnName, id) => {
   // table and columnName are defined within the server, not by the user,
   // so SQL Injection pretection not required - A hacker with sufficient
@@ -84,5 +88,5 @@ exports.checkValidVoteIncrease = (increaseVotesBy) => {
   if (votesKeys.length !== 1 || votesKeys[0] !== "inc_votes") {
     return false;
   }
-  return Number.isInteger(increaseVotesBy.inc_votes)
-}
+  return Number.isInteger(increaseVotesBy.inc_votes);
+};

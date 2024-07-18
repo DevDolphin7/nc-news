@@ -13,6 +13,16 @@
       }
     ]
   },
+  "GET /api/users/:username": {
+    "description": "Get a user",
+    "exampleResponse": {
+      "user": {
+        "username": "weegembump",
+        "name": "Killoah",
+        "avatar_url": "www.example.com/avatar_image_url"
+      }
+    }
+  },
   "GET /api/topics": {
     "description": "serves an array of all topics",
     "queries": [],

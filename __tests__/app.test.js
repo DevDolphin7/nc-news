@@ -77,6 +77,56 @@ describe("/api/users", () => {
   });
 });
 
+describe("/api/users/:username", () => {
+  describe("GET", () => {
+    describe("Happy paths", () => {
+      test("200: User is an object with keys: username, name, avatar_url", () => {
+        return request(app)
+          .get("/api/users/lurker")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.user).toEqual({
+              username: "lurker",
+              name: "do_nothing",
+              avatar_url:
+                "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+            });
+          });
+      });
+
+      test("200: Responds with the requested user", () => {
+        return request(app)
+          .get("/api/users/lurker")
+          .expect(200)
+          .then(({ body }) => {
+            const user = body.user;
+            expect(user.username).toBe("lurker");
+          });
+      });
+    });
+
+    describe("Sad paths", () => {
+      test("400: Responds with 'Bad request' on an invalid username input", () => {
+        return request(app)
+          .get("/api/users/Droping;all;dbs")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.message).toBe("Bad request");
+          });
+      });
+
+      test("404: Responds with 'User not found' on a valid username input that doesn't exist", () => {
+        return request(app)
+          .get("/api/users/helloWorld")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.message).toBe("User not found");
+          });
+      });
+    });
+  });
+});
+
 describe("/api/topics", () => {
   describe("GET", () => {
     test("200: Responds with topics array of objects with keys: slug, description", () => {
