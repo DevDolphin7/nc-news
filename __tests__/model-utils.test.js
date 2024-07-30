@@ -14,7 +14,7 @@ beforeEach(() => seed(data));
 
 afterAll(() => db.end());
 
-describe.only("checkValidUsername", () => {
+describe("checkValidUsername", () => {
   test("Returns a boolean", () => {
     const input = "Hello";
     const output = checkValidUsername(input);
