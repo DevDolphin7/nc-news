@@ -5,21 +5,28 @@
   },
   "GET /api/users": {
     "description": "Get all users",
-    "exampleResponse": [
-      {
-        "username": "weegembump",
-        "name": "Killoah",
-        "avatar_url": "www.example.com/avatar_image_url"
-      }
-    ]
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "tickle122",
+          "name": "Tom Tickle",
+          "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/d/d6/Mr-Tickle-9a.png/revision/latest?cb=20180127221953"
+        },
+        {
+          "username": "grumpy19",
+          "name": "Paul Grump",
+          "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013"
+        }
+      ]
+    }
   },
   "GET /api/users/:username": {
     "description": "Get a user",
     "exampleResponse": {
       "user": {
-        "username": "weegembump",
-        "name": "Killoah",
-        "avatar_url": "www.example.com/avatar_image_url"
+        "username": "tickle122",
+        "name": "Tom Tickle",
+        "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/d/d6/Mr-Tickle-9a.png/revision/latest?cb=20180127221953"
       }
     }
   },
@@ -27,7 +34,10 @@
     "description": "serves an array of all topics",
     "queries": [],
     "exampleResponse": {
-      "topics": [{ "slug": "football", "description": "Footie!" }]
+      "topics": [
+        { "slug": "coding", "description": "Code is love, code is life" },
+        { "slug": "football", "description": "FOOTIE!" }
+      ]
     }
   },
   "GET /api/articles": {
@@ -50,13 +60,24 @@
     "exampleResponse": {
       "articles": [
         {
-          "title": "Seafood substitutions are increasing",
+          "author": "grumpy19",
+          "title": "The Notorious MSG’s Unlikely Formula For Success",
+          "article_id": 34,
           "topic": "cooking",
-          "author": "weegembump",
-          "body": "Text from the article..",
-          "created_at": "2018-05-30T15:59:13.341Z",
+          "created_at": "2020-11-22T11:13:00.000Z",
           "votes": 0,
-          "comment_count": 6
+          "article_img_url": "https://images.pexels.com/photos/2403392/pexels-photo-2403392.jpeg?w=700&h=700",
+          "comment_count": "11"
+        },
+        {
+          "author": "tickle122",
+          "title": "The battle for Node.js security has only begun",
+          "article_id": 12,
+          "topic": "coding",
+          "created_at": "2020-11-15T13:25:00.000Z",
+          "votes": 0,
+          "article_img_url": "https://images.pexels.com/photos/10845119/pexels-photo-10845119.jpeg?w=700&h=700",
+          "comment_count": "7"
         }
       ]
     }
@@ -79,36 +100,33 @@
       "order": ["asc", "desc"]
     },
     "exampleResponse": {
-      "article": [
-        {
-          "article_id": "3",
-          "title": "Seafood substitutions are increasing",
-          "topic": "cooking",
-          "author": "weegembump",
-          "body": "Text from the article..",
-          "created_at": "2018-05-30T15:59:13.341Z",
-          "votes": 0,
-          "article_img_url": "www.example.com/article_image_url"
-        }
-      ]
+      "article": {
+        "article_id": 1,
+        "title": "Running a Node App",
+        "topic": "coding",
+        "author": "jessjelly",
+        "body": "This is part two of a series on how to get up and running with Systemd and Node.js. This part dives deeper into how to successfully run your app with systemd long-term, and how to set it up in a production environment.",
+        "created_at": "2020-11-07T06:03:00.000Z",
+        "votes": 0,
+        "article_img_url": "https://images.pexels.com/photos/11035380/pexels-photo-11035380.jpeg?w=700&h=700",
+        "comment_count": "8"
+      }
     }
   },
   "PATCH /api/articles/:article_id": {
     "description": "Update an article vote count by article_id",
     "format": { "inc_votes": 1 },
     "exampleResponse": {
-      "updatedArticle": [
-        {
-          "article_id": "3",
-          "title": "Seafood substitutions are increasing",
-          "topic": "cooking",
-          "author": "weegembump",
-          "body": "Text from the article..",
-          "created_at": "2018-05-30T15:59:13.341Z",
-          "votes": 1,
-          "article_img_url": "www.example.com/article_image_url"
-        }
-      ]
+      "updatedArticle": {
+        "article_id": 1,
+        "title": "Running a Node App",
+        "topic": "coding",
+        "author": "jessjelly",
+        "body": "This is part two of a series on how to get up and running with Systemd and Node.js. This part dives deeper into how to successfully run your app with systemd long-term, and how to set it up in a production environment.",
+        "created_at": "2020-11-07T06:03:00.000Z",
+        "votes": 1,
+        "article_img_url": "https://images.pexels.com/photos/11035380/pexels-photo-11035380.jpeg?w=700&h=700"
+      }
     }
   },
   "GET /api/articles/:article_id/comments": {
@@ -116,45 +134,53 @@
     "exampleResponse": {
       "comments": [
         {
-          "comment_id": 6,
-          "body": "The owls are not what they seem.",
-          "votes": 20,
-          "author": "icellusedkars",
-          "article_id": 9,
-          "created_at": 1584205320000
+          "comment_id": 31,
+          "body": "Sit sequi odio suscipit. Iure quisquam qui alias distinctio eos officia enim aut sit.",
+          "article_id": 1,
+          "author": "weegembump",
+          "votes": 11,
+          "created_at": "2020-09-26T17:16:00.000Z"
+        },
+        {
+          "comment_id": 33,
+          "body": "Explicabo perspiciatis voluptatem sunt tenetur maxime aut. Optio totam modi.",
+          "article_id": 1,
+          "author": "cooljmessy",
+          "votes": 4,
+          "created_at": "2019-12-31T21:21:00.000Z"
         }
       ]
     }
   },
   "POST /api/articles/:article_id/comments": {
     "description": "Add a comment to an article",
+    "format": {
+      "username": "cooljmessy",
+      "body": "I loved this article, it really changed my life!"
+    },
     "exampleResponse": {
-      "comment": [
-        {
-          "comment_id": 6,
-          "body": "The owls are not what they seem.",
-          "votes": 20,
-          "author": "icellusedkars",
-          "article_id": 9,
-          "created_at": 1584205320000
-        }
-      ]
+      "comment": {
+        "comment_id": 301,
+        "body": "I loved this article, it really changed my life!",
+        "article_id": 1,
+        "author": "cooljmessy",
+        "votes": 0,
+        "created_at": "2024-08-07T09:24:26.071Z"
+      }
     }
   },
   "PATCH /api/comments/:comment_id": {
     "description": "Update a comment vote count by comment_id",
     "format": { "inc_votes": 1 },
     "exampleResponse": {
-      "updatedComment": [
-        {
-          "comment_id": 6,
-          "body": "The owls are not what they seem.",
-          "votes": 21,
-          "author": "icellusedkars",
-          "article_id": 9,
-          "created_at": 1584205320000
-        }
-      ]
+      "updatedComment": {
+        "comment_id": 7,
+        "body": "Facilis corporis animi et non non minus nisi. Magnam et sequi dolorum fugiat ab assumenda.",
+        "article_id": 17,
+        "author": "tickle122",
+        "votes": 13,
+        "created_at": "2020-04-08T23:10:00.000Z"
+      }
     }
   },
   "DELETE /api/comments/:comment_id": {
