@@ -12,7 +12,7 @@ exports.fetchCommentsOfArticle = (article_id) => {
   // Push the outcome query into the array
   queryPromises.push(
     db
-      .query("SELECT * FROM comments WHERE article_id = $1", [article_id])
+      .query("SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC", [article_id])
       .then(({ rows }) => {
         return rows;
       })
